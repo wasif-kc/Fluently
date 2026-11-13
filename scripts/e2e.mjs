@@ -138,6 +138,7 @@ try {
   check((await page.locator('.res-why').count()) === 2, 'every error has a "Why" line');
   check(await page.isVisible(`.res-line:has-text("You did not change")`), 'the missed error is explained');
   void s1;
+  await page.waitForTimeout(400); // let the pop-up finish fading in
   await page.screenshot({ path: path.join(OUT, '06-results.png') });
   await page.click('.results__foot .btn--outline');
   check(await page.isVisible('.mark--ok') && await page.isVisible('.mark--bad'), 'review shows fixed (green) and missed (red) errors');
