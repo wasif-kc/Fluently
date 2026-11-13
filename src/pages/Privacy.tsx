@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useT } from '../lib/text';
 import { Layout } from '../components/Layout';
-import { CONTACT_EMAIL } from '../config';
+import { Fragment } from 'react';
+import { CONTACT_EMAILS } from '../config';
 import { IconArrowLeft } from '../components/Icons';
 
 const PARTS = ['what', 'why', 'email', 'optout', 'delete', 'sell', 'firebase'];
@@ -10,7 +11,13 @@ const PARTS = ['what', 'why', 'email', 'optout', 'delete', 'sell', 'firebase'];
 export function Privacy() {
   const t = useT();
   const navigate = useNavigate();
-  const email = CONTACT_EMAIL || '[contact email]';
+  // The contact emails as links: "a@x.com or b@y.com".
+  const emails = CONTACT_EMAILS.map((e, i) => (
+    <Fragment key={e}>
+      {i > 0 && ` ${t('privacy.or')} `}
+      <a href={`mailto:${e}`}>{e}</a>
+    </Fragment>
+  ));
   return (
     <Layout howto={t('privacy.howto')}>
       <article className="privacy reading">
@@ -23,11 +30,14 @@ export function Privacy() {
           <section key={p}>
             <h2>{t(`privacy.${p}_h`)}</h2>
             <p>
-              {t(`privacy.${p}`, { email })
-                .split(email)
-                .flatMap((chunk, i, arr) =>
-                  i < arr.length - 1 ? [chunk, <a key={i} href={`mailto:${email}`}>{email}</a>] : [chunk],
-                )}
+              {t(`privacy.${p}`)
+                .split('{email}')
+                .map((chunk, i) => (
+                  <Fragment key={i}>
+                    {i > 0 && emails}
+                    {chunk}
+                  </Fragment>
+                ))}
             </p>
           </section>
         ))}

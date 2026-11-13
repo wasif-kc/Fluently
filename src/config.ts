@@ -13,8 +13,8 @@ export const TOOLS = cfg.tools as ToolInfo[];
 /** Emails that may open /admin. The same list is written into firestore.rules by `npm run rules`. */
 export const ADMIN_EMAILS = (cfg.adminEmails as string[]).map((e) => e.toLowerCase());
 
-/** Contact email for the privacy page and deletion requests. */
-export const CONTACT_EMAIL = cfg.contactEmail as string;
+/** Contact emails for the privacy page and deletion requests. */
+export const CONTACT_EMAILS = (cfg.contactEmails as string[]).filter(Boolean);
 
 const realConfig = cfg.firebase;
 

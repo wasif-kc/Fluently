@@ -1,17 +1,31 @@
 {
   "_readme": "Site settings. Claude (or Kishoar) edits this file, not Tonim.",
-  "adminEmails": [],
-  "contactEmail": "",
+  "adminEmails": [
+    "kishoarwasif2000@gmail.com",
+    "kishoarwasif@gmail.com"
+  ],
+  "contactEmails": [
+    "kishoarwasif2000@gmail.com",
+    "kishoarwasif@gmail.com"
+  ],
   "tools": [
-    { "id": "grammar", "name": "Grammar", "status": "live" },
-    { "id": "idioms", "name": "Phrases and Idioms", "status": "coming_soon" }
+    {
+      "id": "grammar",
+      "name": "Grammar",
+      "status": "live"
+    },
+    {
+      "id": "idioms",
+      "name": "Phrases and Idioms",
+      "status": "coming_soon"
+    }
   ],
   "firebase": {
-    "apiKey": "",
-    "authDomain": "",
-    "projectId": "",
-    "storageBucket": "",
-    "messagingSenderId": "",
-    "appId": ""
+    "apiKey": "AIzaSyB83FXApC6wWR6RYyzhe7QQpK2XXDXjz3s",
+    "authDomain": "fluently-b9f39.firebaseapp.com",
+    "projectId": "fluently-b9f39",
+    "storageBucket": "fluently-b9f39.firebasestorage.app",
+    "messagingSenderId": "873424786946",
+    "appId": "1:873424786946:web:fc95cc5eb20f3b2fea791b"
   }
 }

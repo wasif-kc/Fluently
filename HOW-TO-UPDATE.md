@@ -2,6 +2,8 @@
 
 You only ever edit the Excel file. The website is rebuilt from it.
 
+**The website:** https://fluently-b9f39.web.app (admin page: https://fluently-b9f39.web.app/admin)
+
 ## The easy way: ask Claude
 Upload the new `IELTS_Grammar_Content_Master.xlsx` to a Claude Code session on this project and say "update the content and publish". Claude runs the steps below and tells you if any row needs fixing.
 

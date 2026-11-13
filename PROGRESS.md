@@ -2,6 +2,32 @@
 
 Read this at the start of every session (CLAUDE.md section 0).
 
+## Session 2 (13 Nov 2026)
+
+### Answers to the open questions (CLAUDE.md section 10)
+- Admin emails: kishoarwasif2000@gmail.com, kishoarwasif@gmail.com (in `fluently.config.json` and `firestore.rules`).
+- Contact emails for the privacy page: both of the above (shown as "a or b").
+- Domain: none yet. Launch on the free address https://fluently-b9f39.web.app
+- Test Google account: kishoarfisaw@gmail.com (for trying the live site as a student).
+
+### Done
+- Firebase project `fluently-b9f39` connected (`fluently.config.json`, `.firebaserc`).
+- Checked with read-only calls: Google sign-in is on; Firestore exists and is locked; `fluently-b9f39.web.app` and `.firebaseapp.com` are authorised domains.
+- Privacy wording now final apart from Tonim's approval. Changed `privacy.sell` to "We never sell your data or share it with advertisers or other companies." (Firebase stores it, so "share with anyone" was not accurate.)
+- Added one more AppText row: `privacy.or` ("or", joins the two contact emails). AppText now has 121 added rows in total.
+- All tests pass: 554 unit, 10 rules, full browser test.
+
+### Next
+1. Merge this branch into `main` (needed for the GitHub "Publish Fluently" button to appear).
+2. Tonim/Kishoar saves the Firebase publishing key as the GitHub secret `FIREBASE_SERVICE_ACCOUNT`.
+3. Ask, then publish with the button. If it fails with a permissions error, give the service account the "Firebase Admin" role in Google Cloud IAM.
+4. Phone sign-in on iPhone/Firefox: add `https://fluently-b9f39.web.app/__/auth/handler` to the OAuth client's authorised redirect URIs (Google Cloud console → Credentials → "Web client (auto created by Google Service)"), then change `authDomain` in `fluently.config.json` to `fluently-b9f39.web.app`. Today Google rejects that address (checked: redirect_uri_mismatch), so `authDomain` stays `fluently-b9f39.firebaseapp.com` for now.
+5. Test the live site with kishoarfisaw@gmail.com.
+
+### Open problems
+- This cloud machine's network blocks `*.firebaseapp.com`, `*.web.app` and `apis.google.com`, so the real Google popup cannot be tested here (only through the emulators). Test the live site from a normal browser.
+
+
 ## Session 1 (13 Nov 2026)
 
 ### Done

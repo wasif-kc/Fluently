@@ -10,7 +10,7 @@ service cloud.firestore {
     function isAdmin() {
       return signedIn()
         && request.auth.token.email_verified == true
-        && request.auth.token.email.lower() in [];
+        && request.auth.token.email.lower() in ["kishoarwasif2000@gmail.com", "kishoarwasif@gmail.com"];
     }
 
     // One document per student. A student can read and write only their own document.
