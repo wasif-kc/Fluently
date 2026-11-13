@@ -24,6 +24,14 @@ Read this at the start of every session (CLAUDE.md section 0).
 4. Phone sign-in on iPhone/Firefox: add `https://fluently-b9f39.web.app/__/auth/handler` to the OAuth client's authorised redirect URIs (Google Cloud console → Credentials → "Web client (auto created by Google Service)"), then change `authDomain` in `fluently.config.json` to `fluently-b9f39.web.app`. Today Google rejects that address (checked: redirect_uri_mismatch), so `authDomain` stays `fluently-b9f39.firebaseapp.com` for now.
 5. Test the live site with kishoarfisaw@gmail.com.
 
+### Publishing attempt 1 (13 Nov 2026)
+- Merged the branch into `main` ([wasif-kc/Fluently#1](https://github.com/wasif-kc/Fluently/pull/1)) and ran "Publish Fluently".
+- Content, tests and build passed on GitHub. The publish step failed before anything was uploaded: the `firebase-adminsdk` service account got `403 Permission denied to get service [firestore.googleapis.com]` (serviceusage).
+- Fix asked of the user: in Google Cloud IAM, give the `firebase-adminsdk-…` account the roles **Firebase Admin** and **Service Usage Consumer**, then run Publish again.
+
+- User added the two IAM roles and the redirect URI. Checked: Google now accepts `https://fluently-b9f39.web.app/__/auth/handler`, so `authDomain` is now `fluently-b9f39.web.app` (sign-in on iPhones and Firefox works).
+- Workflows moved to actions/checkout@v5 and actions/setup-node@v5 (Node 20 actions are deprecated).
+
 ### Open problems
 - This cloud machine's network blocks `*.firebaseapp.com`, `*.web.app` and `apis.google.com`, so the real Google popup cannot be tested here (only through the emulators). Test the live site from a normal browser.
 
