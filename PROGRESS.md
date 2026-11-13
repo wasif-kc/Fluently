@@ -17,20 +17,16 @@ Read this at the start of every session (CLAUDE.md section 0).
 - Added one more AppText row: `privacy.or` ("or", joins the two contact emails). AppText now has 121 added rows in total.
 - All tests pass: 554 unit, 10 rules, full browser test.
 
+### Publishing
+- Attempt 1 ([wasif-kc/Fluently#1](https://github.com/wasif-kc/Fluently/pull/1) merged): content, tests and build passed; the publish step stopped before uploading anything, because the `firebase-adminsdk` service account had no serviceusage permission (403).
+- The user then gave that account the roles **Firebase Admin** and **Service Usage Consumer**, and added `https://fluently-b9f39.web.app/__/auth/handler` to the OAuth client's redirect URIs. Checked: Google now accepts it, so `authDomain` is now `fluently-b9f39.web.app` (redirect sign-in works on iPhones and Firefox).
+- Workflows moved to actions/checkout@v5 and actions/setup-node@v5.
+- Attempt 2 ([wasif-kc/Fluently#2](https://github.com/wasif-kc/Fluently/pull/2) merged): **"Deploy complete"**. Security rules released, 150 files uploaded. **Live at https://fluently-b9f39.web.app**
+
 ### Next
-1. Merge this branch into `main` (needed for the GitHub "Publish Fluently" button to appear).
-2. Tonim/Kishoar saves the Firebase publishing key as the GitHub secret `FIREBASE_SERVICE_ACCOUNT`.
-3. Ask, then publish with the button. If it fails with a permissions error, give the service account the "Firebase Admin" role in Google Cloud IAM.
-4. Phone sign-in on iPhone/Firefox: add `https://fluently-b9f39.web.app/__/auth/handler` to the OAuth client's authorised redirect URIs (Google Cloud console → Credentials → "Web client (auto created by Google Service)"), then change `authDomain` in `fluently.config.json` to `fluently-b9f39.web.app`. Today Google rejects that address (checked: redirect_uri_mismatch), so `authDomain` stays `fluently-b9f39.firebaseapp.com` for now.
-5. Test the live site with kishoarfisaw@gmail.com.
-
-### Publishing attempt 1 (13 Nov 2026)
-- Merged the branch into `main` ([wasif-kc/Fluently#1](https://github.com/wasif-kc/Fluently/pull/1)) and ran "Publish Fluently".
-- Content, tests and build passed on GitHub. The publish step failed before anything was uploaded: the `firebase-adminsdk` service account got `403 Permission denied to get service [firestore.googleapis.com]` (serviceusage).
-- Fix asked of the user: in Google Cloud IAM, give the `firebase-adminsdk-…` account the roles **Firebase Admin** and **Service Usage Consumer**, then run Publish again.
-
-- User added the two IAM roles and the redirect URI. Checked: Google now accepts `https://fluently-b9f39.web.app/__/auth/handler`, so `authDomain` is now `fluently-b9f39.web.app` (sign-in on iPhones and Firefox works).
-- Workflows moved to actions/checkout@v5 and actions/setup-node@v5 (Node 20 actions are deprecated).
+1. The user tries the live site: sign in on a computer and on a phone (test account kishoarfisaw@gmail.com), finish a warm-up and a drill, and open /admin with an admin email.
+2. Tonim approves the privacy wording (or sends changes for the `privacy.*` AppText rows).
+3. Later: connect a custom domain when one is bought (add it in Firebase Hosting, add it to Auth's authorised domains and to the OAuth redirect URIs, then update `authDomain`).
 
 ### Open problems
 - This cloud machine's network blocks `*.firebaseapp.com`, `*.web.app` and `apis.google.com`, so the real Google popup cannot be tested here (only through the emulators). Test the live site from a normal browser.
