@@ -1,0 +1,41 @@
+{
+  "name": "fluently",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Fluently: free IELTS self-study platform",
+  "scripts": {
+    "dev": "firebase emulators:exec --only auth,firestore --project demo-fluently \"vite\"",
+    "content": "node scripts/build-content.mjs",
+    "rules": "node scripts/write-rules.mjs",
+    "build": "node scripts/write-rules.mjs && tsc -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:rules": "node scripts/write-rules.mjs && firebase emulators:exec --only firestore --project demo-fluently \"vitest run --config vitest.rules.config.ts\"",
+    "test:browser": "firebase emulators:exec --only auth,firestore --project demo-fluently \"node scripts/e2e.mjs\"",
+    "deploy": "node scripts/deploy.mjs"
+  },
+  "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/open-sans": "^5.3.0",
+    "firebase": "^12.19.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
+    "firebase-tools": "^15.36.0",
+    "typescript": "~5.9",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0",
+    "xlsx": "^0.18.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
