@@ -29,6 +29,9 @@ Read this at the start of every session (CLAUDE.md section 0).
 - Content, tests and build passed on GitHub. The publish step failed before anything was uploaded: the `firebase-adminsdk` service account got `403 Permission denied to get service [firestore.googleapis.com]` (serviceusage).
 - Fix asked of the user: in Google Cloud IAM, give the `firebase-adminsdk-…` account the roles **Firebase Admin** and **Service Usage Consumer**, then run Publish again.
 
+- User added the two IAM roles and the redirect URI. Checked: Google now accepts `https://fluently-b9f39.web.app/__/auth/handler`, so `authDomain` is now `fluently-b9f39.web.app` (sign-in on iPhones and Firefox works).
+- Workflows moved to actions/checkout@v5 and actions/setup-node@v5 (Node 20 actions are deprecated).
+
 ### Open problems
 - This cloud machine's network blocks `*.firebaseapp.com`, `*.web.app` and `apis.google.com`, so the real Google popup cannot be tested here (only through the emulators). Test the live site from a normal browser.
 
