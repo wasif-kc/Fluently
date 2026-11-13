@@ -1,0 +1,17 @@
+{
+  "_readme": "Site settings. Claude (or Kishoar) edits this file, not Tonim.",
+  "adminEmails": [],
+  "contactEmail": "",
+  "tools": [
+    { "id": "grammar", "name": "Grammar", "status": "live" },
+    { "id": "idioms", "name": "Phrases and Idioms", "status": "coming_soon" }
+  ],
+  "firebase": {
+    "apiKey": "",
+    "authDomain": "",
+    "projectId": "",
+    "storageBucket": "",
+    "messagingSenderId": "",
+    "appId": ""
+  }
+}

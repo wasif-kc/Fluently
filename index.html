@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Fluently is a free, self-guided IELTS practice platform. Learn each grammar rule, warm up with quick cards, then fix the mistakes in short IELTS-style drills." />
+    <meta name="theme-color" content="#1f3a5f" />
+    <title>Fluently · IELTS practice</title>
+    <script>
+      // Apply saved theme and text settings before the page draws, so it does not flash.
+      try {
+        var s = JSON.parse(localStorage.getItem('fluently:settings') || 'null');
+        if (s) {
+          if (s.dark) document.documentElement.setAttribute('data-theme', 'dark');
+          if (s.font) document.documentElement.setAttribute('data-font', s.font);
+          if (s.textSize) document.documentElement.style.setProperty('--text-scale', String(s.textSize / 100));
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
