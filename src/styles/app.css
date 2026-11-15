@@ -29,7 +29,7 @@
   --shadow-lg: 0 10px 40px rgba(16, 33, 56, 0.18);
   --radius: 14px;
   --radius-lg: 18px;
-  --ui-font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --ui-font: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --reading-font: var(--ui-font);
   --text-scale: 1;
   color-scheme: light;

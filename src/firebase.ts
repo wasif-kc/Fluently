@@ -1,33 +1,52 @@
 import { initializeApp } from 'firebase/app';
-import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import {
-  initializeFirestore,
-  memoryLocalCache,
-  persistentLocalCache,
-  persistentMultipleTabManager,
-  type Firestore,
-} from 'firebase/firestore';
+  browserLocalPersistence,
+  browserSessionPersistence,
+  connectAuthEmulator,
+  indexedDBLocalPersistence,
+  initializeAuth,
+} from 'firebase/auth';
 import { firebaseConfig, FIREBASE_READY, USE_EMULATORS } from './config';
 
 export const app = FIREBASE_READY ? initializeApp(firebaseConfig) : null;
-export const auth = app ? getAuth(app) : null;
 
-let firestore: Firestore | null = null;
-if (app) {
-  if (USE_EMULATORS) {
-    // The emulators are reached through the dev server (see vite.config.ts), so a preview link works too.
-    firestore = initializeFirestore(app, {
-      host: window.location.host,
-      ssl: window.location.protocol === 'https:',
-      localCache: memoryLocalCache(),
-      experimentalForceLongPolling: true,
-    });
-    if (auth) connectAuthEmulator(auth, window.location.origin, { disableWarnings: true });
-  } else {
-    // Keeps a copy on the device, so progress made offline is saved once back online.
-    firestore = initializeFirestore(app, {
-      localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+// Sign-in. The Google popup/redirect helper is passed only when the student presses
+// "Continue with Google" (see state/auth.tsx). Setting it here would make phones download
+// Google's sign-in helper on every visit, even when nobody signs in.
+export const auth = app
+  ? initializeAuth(app, { persistence: [indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence] })
+  : null;
+if (auth && USE_EMULATORS) connectAuthEmulator(auth, window.location.origin, { disableWarnings: true });
+
+let dbModule: Promise<typeof import('./lib/db')> | null = null;
+
+/** Loads the database code (once). Only signed-in students need it. */
+export function loadDb(): Promise<typeof import('./lib/db')> {
+  if (!dbModule) {
+    dbModule = import('./lib/db').catch((e) => {
+      dbModule = null;
+      throw e;
     });
   }
+  return dbModule;
 }
-export const db = firestore;
+
+const HINT_KEY = 'fluently:signedIn';
+
+/** Remember on this device that someone is signed in, so the database code can start loading straight away next time. */
+export function setSignedInHint(on: boolean): void {
+  try {
+    if (on) localStorage.setItem(HINT_KEY, '1');
+    else localStorage.removeItem(HINT_KEY);
+  } catch {
+    /* storage blocked: ignore */
+  }
+}
+
+export function hasSignedInHint(): boolean {
+  try {
+    return localStorage.getItem(HINT_KEY) === '1';
+  } catch {
+    return false;
+  }
+}

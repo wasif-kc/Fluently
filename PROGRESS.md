@@ -2,6 +2,27 @@
 
 Read this at the start of every session (CLAUDE.md section 0).
 
+## Session 4 (15 Nov 2026): smaller first visit and caching
+
+Measured what a brand-new visitor downloads (compressed sizes):
+
+| | Before | After |
+|---|---|---|
+| Sign-in page, new visitor | 335 KB, 7 files | **166 KB**, 9 files |
+| Phones, every visit | + Google's sign-in helper | only when "Continue with Google" is pressed |
+| Signed-in dashboard, fresh device | about 370 KB | **277 KB** (includes the database code) |
+| Opening a rule page after that | (already in the big file) | 11 KB (lesson + page) |
+
+What changed:
+- Firestore code is loaded only after sign-in (`src/lib/db.ts`, `loadDb()` in `src/firebase.ts`); a returning student's device starts loading it straight away (`fluently:signedIn` note in local storage).
+- Auth is set up without the popup/redirect helper; it is passed to `signInWithPopup` / `signInWithRedirect` / `getRedirectResult` only when used. A returning phone sign-in is checked only if one was started in that tab (`fluently:redirect` in session storage). Tested both paths with the auth emulator: OK.
+- Each page (rules, warm-up, drill, privacy, profile setup, admin) is its own file. After a signed-in page loads, the three lesson pages are fetched quietly (about 12 KB) so moving around is instant and works offline.
+- Libraries (React, Firebase sign-in) are separate files whose names do not change when the app changes, so returning visitors keep them.
+- Fonts: Inter is one variable file (48 KB for all weights, was up to 5 files of 24 KB); Open Sans and Atkinson load only the Latin alphabet. The stylesheet went from 24 KB to 8 KB.
+- Caching (`firebase.json`): pages and lessons `no-cache` (always checked; before, Firebase's default let browsers keep the page for an hour, which could show a blank page right after an update); `/assets/**` kept for a year; missing old assets return 404; the app reloads once if an open tab asks for an old file, and shows "This lesson couldn't load…" with Retry if a page file cannot be downloaded (e.g. offline).
+- This session's cloud environment now allows `apis.google.com` and `fluently-b9f39.web.app` (new personal environment "Fluently"), so sign-in and the live site can be checked from here.
+
+
 ## Session 3 (15 Nov 2026): fixes from the live site
 
 Requested after testing the live site; CLAUDE.md updated (look for "Changed 15 Nov").

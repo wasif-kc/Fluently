@@ -137,7 +137,7 @@ These keep internal codes away from students:
   - **Firestore:** student data only.
   - **Hosting:** the website.
 - Stay on the **free Spark plan**. Never enable anything that needs billing. Firebase Analytics is not used.
-- Fonts are installed with the project (`@fontsource/inter`, `@fontsource/open-sans`, `@fontsource/atkinson-hyperlegible`). Georgia is a system font: `Georgia, "Times New Roman", serif`.
+- Fonts are installed with the project (`@fontsource-variable/inter`, one 48 KB file for every weight; `@fontsource/open-sans` and `@fontsource/atkinson-hyperlegible`, Latin alphabet only). Georgia is a system font: `Georgia, "Times New Roman", serif`.
 - The code lives in a GitHub repository. Commit after each stage, with short plain messages.
 
 ### 3.2 Content pipeline (Excel → app)
@@ -234,6 +234,7 @@ Use **one document per student**, `users/{uid}`, to keep reads and writes low:
 - Firebase Hosting. Use the free default address (`<project>.web.app`) until Tonim buys a domain. Later, connect the custom domain he chooses.
 - Add the hosting address to Firebase Auth's "authorized domains".
 - Meta title: "Fluently · IELTS practice". Add a simple description and a favicon (a teal "F").
+- **Keep the first visit small** (added 15 Nov): the database code (Firestore) and each page load only when needed; Google's sign-in helper loads only when "Continue with Google" is pressed. Caching (`firebase.json`): pages and `/content/**` are `no-cache` (always checked, so updates show at once); `/assets/**` (file names change with every change) are kept for a year; a missing old asset returns 404, and the app reloads itself once if a tab asks for a file from an older version.
 
 ---
 
