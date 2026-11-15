@@ -234,7 +234,7 @@ Use **one document per student**, `users/{uid}`, to keep reads and writes low:
 - Firebase Hosting. Use the free default address (`<project>.web.app`) until Tonim buys a domain. Later, connect the custom domain he chooses.
 - Add the hosting address to Firebase Auth's "authorized domains".
 - Meta title: "Fluently · IELTS practice". Add a simple description and a favicon (a teal "F").
-- **Keep the first visit small** (added 15 Nov): the database code (Firestore) and each page load only when needed; Google's sign-in helper loads only when "Continue with Google" is pressed. Caching (`firebase.json`): pages and `/content/**` are `no-cache` (always checked, so updates show at once); `/assets/**` (file names change with every change) are kept for a year; a missing old asset returns 404, and the app reloads itself once if a tab asks for a file from an older version.
+- **Keep the first visit small** (added 15 Nov): the database code (Firestore) and each page load only when needed; Google's sign-in helper loads only when "Continue with Google" is pressed. Caching (`firebase.json`): pages and `/content/**` are `public, max-age=0, s-maxage=86400` (browsers always check, so updates show at once; Firebase's network keeps a copy, cleared on every publish, and answers "unchanged" (304) when nothing changed); `/assets/**` (file names change with every change) are kept for a year; a missing old asset returns 404, and the app reloads itself once if a tab asks for a file from an older version.
 
 ---
 
