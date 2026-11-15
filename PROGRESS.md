@@ -12,6 +12,8 @@ Measured what a brand-new visitor downloads (compressed sizes):
 | Phones, every visit | + Google's sign-in helper | only when "Continue with Google" is pressed |
 | Signed-in dashboard, fresh device | about 370 KB | **277 KB** (includes the database code) |
 | Opening a rule page after that | (already in the big file) | 11 KB (lesson + page) |
+| **Live site, measured** (phone): new visitor | ~340 KB + Google helper | **172 KB** in 9 requests |
+| **Live site, measured** (phone): same visitor comes back | page + lessons re-sent | **0.9 KB** (everything else from the phone's cache; unchanged files get a 0-byte 304) |
 
 What changed:
 - Firestore code is loaded only after sign-in (`src/lib/db.ts`, `loadDb()` in `src/firebase.ts`); a returning student's device starts loading it straight away (`fluently:signedIn` note in local storage).
