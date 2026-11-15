@@ -178,6 +178,8 @@ function parseBlock(r) {
     case 'text':
       return { type, title: r.title || undefined, paragraphs: c.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean) };
     case 'key_rule':
+      // One statement per line: "A → b. C → d." becomes two lines.
+      return { type, title: r.title || undefined, lines: c.split(/(?<=[.!?])\s+(?=[A-Z])/).map((l) => l.trim()).filter(Boolean) };
     case 'tip':
       return { type, title: r.title || undefined, text: c };
     case 'table': {

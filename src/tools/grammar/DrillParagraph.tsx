@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import { compareKey, isBlankToken, type DrillGrade, type Edit } from '../../lib/engine';
 import type { Drill, DrillBlank, DrillError } from '../../lib/content';
 import { useT } from '../../lib/text';
-import { IconCheck, IconX } from '../../components/Icons';
+import { IconCheck, IconTrash, IconUndo, IconX } from '../../components/Icons';
 
 const MAX_TOKENS = 8;
 
@@ -112,11 +112,16 @@ export function DrillParagraph({ drill, edits, blanks, onEdits, onBlank, grade }
     setSel(null);
     setBoxPos(null);
     setDirty(false);
+    if (document.activeElement === input.current) input.current?.blur(); // lets the phone keyboard close
   }, []);
 
   // ----- selecting words -----
 
+  /** Focus the correction field during the tap itself, so phones (iPhone too) open the keyboard. */
+  const focusNow = () => input.current?.focus({ preventScroll: true });
+
   const openSelection = (s: Selection) => {
+    focusNow();
     setTipFor(null);
     setSel(s);
     const existing = s.existing ? edits.find((e) => e.sentence === s.sentence && e.start === s.start) : null;
@@ -151,7 +156,7 @@ export function DrillParagraph({ drill, edits, blanks, onEdits, onBlank, grade }
           setDraft(joinSp(sentenceOf(sentence), start, end));
           selectAllNext.current = true; // typing then replaces the selected words
         }
-        input.current?.focus();
+        focusNow();
         return;
       }
     }
@@ -159,15 +164,22 @@ export function DrillParagraph({ drill, edits, blanks, onEdits, onBlank, grade }
     openSelection({ sentence, start: piece.start, end: piece.end, existing: false });
   };
 
-  const save = () => {
+  /** Save the box. An empty box deletes the selected words; the same words as before means "no change". */
+  const save = (remove = false) => {
     if (!sel) return;
-    const text = draft.trim();
+    const text = remove ? '' : draft.trim();
     const s = sentenceOf(sel.sentence);
     const others = edits.filter((e) => !(sel.existing && e.sentence === sel.sentence && e.start === sel.start));
-    const unchanged = compareKey(text) === compareKey(joinSp(s, sel.start, sel.end));
-    // An empty box (or the same words) removes the edit.
-    if (!text || unchanged) onEdits(others);
+    const unchanged = text !== '' && compareKey(text) === compareKey(joinSp(s, sel.start, sel.end));
+    if (unchanged) onEdits(others);
     else onEdits([...others, { sentence: sel.sentence, start: sel.start, end: sel.end, text }]);
+    close();
+  };
+
+  /** Undo an existing change: the original words come back. */
+  const restore = () => {
+    if (!sel) return;
+    onEdits(edits.filter((e) => !(e.sentence === sel.sentence && e.start === sel.start)));
     close();
   };
 
@@ -209,6 +221,26 @@ export function DrillParagraph({ drill, edits, blanks, onEdits, onBlank, grade }
       input.current?.select();
     }
   }, [draft, sel, boxPos]);
+
+  // Keep the (?) tooltip inside the screen (on phones it could run off the left or right edge).
+  useLayoutEffect(() => {
+    if (!tipFor) return;
+    const el = document.getElementById(`tip-${tipFor}`);
+    if (!el) return;
+    el.style.setProperty('--shift', '0px');
+    el.classList.remove('tooltip--up');
+    let r = el.getBoundingClientRect();
+    // Open upwards when there is no room below.
+    if (r.bottom > window.innerHeight - 8 && r.top - r.height - 40 > 0) {
+      el.classList.add('tooltip--up');
+      r = el.getBoundingClientRect();
+    }
+    const vw = document.documentElement.clientWidth;
+    let dx = 0;
+    if (r.left < 8) dx = 8 - r.left;
+    else if (r.right > vw - 8) dx = vw - 8 - r.right;
+    el.style.setProperty('--shift', `${dx}px`);
+  }, [tipFor]);
 
   // Escape closes the correction box even when focus is on a word.
   useEffect(() => {
@@ -333,11 +365,15 @@ export function DrillParagraph({ drill, edits, blanks, onEdits, onBlank, grade }
             data-s={s.no}
             data-i={e.start}
             data-e={e.end}
-            aria-label={`Your correction: ${e.text}. Original: ${joinSp(s, e.start, e.end)}. Press to change.`}
+            aria-label={
+              e.text
+                ? `Your correction: ${e.text}. Original: ${joinSp(s, e.start, e.end)}. Press to change.`
+                : `Removed: ${joinSp(s, e.start, e.end)}. Press to change.`
+            }
             onClick={() => clickPiece(s.no, p)}
             onKeyDown={(ev) => onKey(ev, s.no, p)}
           >
-            {e.text}
+            {e.text ? e.text : <del className="tok__removed">{joinSp(s, e.start, e.end)}</del>}
           </span>,
         );
         continue;
@@ -434,13 +470,14 @@ export function DrillParagraph({ drill, edits, blanks, onEdits, onBlank, grade }
         ))}
       </p>
 
-      {sel && !readOnly && (
+      {!readOnly && (
         <div
           ref={box}
-          className="cbox"
-          style={boxPos ? { top: boxPos.top, left: boxPos.left } : { visibility: 'hidden', top: 0, left: 0 }}
-          role="dialog"
-          aria-label={t('drill.correction')}
+          className={`cbox${sel && boxPos ? '' : ' cbox--idle'}`}
+          style={sel && boxPos ? { top: boxPos.top, left: boxPos.left } : undefined}
+          role={sel ? 'dialog' : undefined}
+          aria-label={sel ? t('drill.correction') : undefined}
+          aria-hidden={sel ? undefined : true}
         >
           <form
             onSubmit={(e) => {
@@ -456,6 +493,8 @@ export function DrillParagraph({ drill, edits, blanks, onEdits, onBlank, grade }
               ref={input}
               className="cbox__input"
               value={draft}
+              tabIndex={sel ? 0 : -1}
+              placeholder={t('drill.fix_placeholder')}
               autoComplete="off"
               autoCapitalize="off"
               spellCheck={false}
@@ -470,10 +509,19 @@ export function DrillParagraph({ drill, edits, blanks, onEdits, onBlank, grade }
                 }
               }}
             />
-            <button type="submit" className="cbox__btn cbox__btn--ok" aria-label={t('drill.save_fix')}>
+            <button type="submit" className="cbox__btn cbox__btn--ok" aria-label={t('drill.save_fix')} title={t('drill.save_fix')} tabIndex={sel ? 0 : -1}>
               <IconCheck size={18} />
             </button>
-            <button type="button" className="cbox__btn cbox__btn--cancel" aria-label={t('drill.cancel_fix')} onClick={close}>
+            {sel?.existing ? (
+              <button type="button" className="cbox__btn cbox__btn--alt" aria-label={t('drill.restore_fix')} title={t('drill.restore_fix')} onClick={restore}>
+                <IconUndo size={17} />
+              </button>
+            ) : (
+              <button type="button" className="cbox__btn cbox__btn--alt" aria-label={t('drill.delete_fix')} title={t('drill.delete_fix')} tabIndex={sel ? 0 : -1} onClick={() => save(true)}>
+                <IconTrash size={17} />
+              </button>
+            )}
+            <button type="button" className="cbox__btn cbox__btn--cancel" aria-label={t('drill.cancel_fix')} title={t('drill.cancel_fix')} tabIndex={sel ? 0 : -1} onClick={close}>
               <IconX size={16} />
             </button>
           </form>

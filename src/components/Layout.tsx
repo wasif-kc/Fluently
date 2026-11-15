@@ -53,7 +53,7 @@ export function Layout({ howto, children, className }: Props) {
                 <span>{t('bar.dashboard')}</span>
               </Link>
             )}
-            <StreakBadge count={streakToShow(data?.streak)} />
+            {onDashboard && <StreakBadge count={streakToShow(data?.streak)} />}
             <ProfileMenu />
           </nav>
         )}

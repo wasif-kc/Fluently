@@ -67,6 +67,7 @@ try {
   await page.goto(BASE + '/');
   await page.waitForSelector('.btn--google');
   check(await page.isVisible('text=Continue with Google'), 'landing page shows "Continue with Google"');
+  check(!(await page.isVisible('text=Prepare for IELTS like never before')), 'no tagline under the logo');
   const email = `e2e-${Date.now()}@example.com`;
   await page.evaluate((em) => window.__fluentlyTestSignIn(em, 'Esha Test'), email);
   await page.waitForSelector('.setup__card');
@@ -192,6 +193,15 @@ try {
   const vw = p2.viewportSize().width;
   check(box && box.x >= 0 && box.x + box.width <= vw, 'correction box fits on a phone screen');
   await p2.screenshot({ path: path.join(OUT, '12-phone-drill.png') });
+  await p2.tap('.cbox__btn--alt');
+  check(await p2.isVisible('.tok__removed'), 'a word can be deleted (bin button)');
+  await p2.tap('.tok--edit');
+  await p2.tap('.cbox__btn--alt');
+  check(!(await p2.isVisible('.tok__removed')), 'a deletion can be undone');
+  await p2.locator('.blank__help').last().tap();
+  const tipBox = await p2.locator('.tooltip--blank').boundingBox();
+  check(tipBox && tipBox.x >= 0 && tipBox.x + tipBox.width <= vw, 'the (?) tip stays inside a phone screen');
+  await p2.screenshot({ path: path.join(OUT, '12b-phone-tip.png') });
   const hasHScroll = await p2.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   check(!hasHScroll, 'no sideways scrolling on the phone');
   await p2.click('.dpanel__show');
@@ -201,6 +211,62 @@ try {
   await p2.waitForSelector('.rules__title');
   check(await p2.isVisible('.rules__mobile-nav select'), 'rule page shows a Sections dropdown on phones');
   await p2.screenshot({ path: path.join(OUT, '14-phone-rules.png') });
+
+  console.log('\nStreak across days (the date is faked)');
+  {
+    const DAY = 24 * 60 * 60 * 1000;
+    const base = new Date();
+    base.setHours(10, 0, 0, 0);
+    const day = (offset) => new Date(base.getTime() + offset * DAY);
+    const sctx = await browser.newContext({ viewport: { width: 1280, height: 860 } });
+    const sp = await sctx.newPage();
+    sp.on('pageerror', (e) => errors.push(e.message));
+    const streakNow = async () => {
+      await sp.goto(BASE + '/');
+      await sp.waitForSelector('.streak__n');
+      return sp.textContent('.streak__n');
+    };
+    const finishDrill = async (n) => {
+      await sp.goto(BASE + `/grammar/articles/drill/${n}`);
+      await sp.waitForSelector('.drill__center .btn');
+      await sp.click('.drill__center .btn');
+      await sp.click('.confirm__actions .btn--primary');
+      await sp.waitForSelector('.results');
+    };
+    // Dates are in the past so sign-in tokens stay valid.
+    await sp.clock.setFixedTime(day(-6));
+    await sp.goto(BASE + '/');
+    await sp.waitForSelector('.btn--google');
+    await sp.evaluate((em) => window.__fluentlyTestSignIn(em, 'Streak Test'), `streak-${Date.now()}@example.com`);
+    await sp.waitForSelector('.setup__card');
+    await sp.click('.setup__card button[type=submit]');
+    await sp.waitForSelector('.tour');
+    await sp.click('.tour .btn--ghost');
+    check((await sp.textContent('.streak__n')) === '0', 'a new student starts with a 0 day streak');
+    await sp.goto(BASE + '/grammar/articles/warmup');
+    await sp.waitForSelector('.fc');
+    for (let i = 0; i < 10; i++) await sp.locator('.fc').nth(i).click();
+    await sp.waitForTimeout(2500); // cards are saved together after about 2 seconds
+    await finishDrill(1);
+    check((await streakNow()) === '1', 'day 1: finishing a drill gives a 1 day streak');
+    await finishDrill(2);
+    check((await streakNow()) === '1', 'day 1: a second drill on the same day changes nothing');
+    await sp.clock.setFixedTime(day(-5));
+    check((await streakNow()) === '1', 'day 2, before any drill: still shows 1 (yesterday counts)');
+    await finishDrill(3);
+    check((await streakNow()) === '2', 'day 2: finishing a drill makes it 2');
+    await sp.clock.setFixedTime(day(-4));
+    await finishDrill(4);
+    check((await streakNow()) === '3', 'day 3: 3 days in a row');
+    await sp.clock.setFixedTime(day(-1));
+    check((await streakNow()) === '0', 'after missing days: shows 0');
+    await finishDrill(5);
+    check((await streakNow()) === '1', 'after a gap: finishing a drill starts again at 1');
+    await sp.goto(BASE + '/grammar/articles/rules');
+    await sp.waitForSelector('.rules__title');
+    check(!(await sp.isVisible('.streak')), 'streak is not shown on other pages');
+    await sctx.close();
+  }
 
   console.log('\nSign out');
   await page.goto(BASE + '/');

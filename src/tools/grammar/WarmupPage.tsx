@@ -32,6 +32,7 @@ function FlashCard({ card, flipped, onFlip }: { card: Card; flipped: boolean; on
         type="button"
         className={`fc${flipped ? ' fc--flipped' : ''}`}
         aria-pressed={flipped}
+        onMouseDown={(e) => e.preventDefault() /* no scroll-to-focus jump when tapped */}
         aria-label={`${t('warm.card', { n: card.no })}. ${flipped ? `${card.answer}. ${card.why}` : card.front.replace(/_{3,}/, 'blank')}`}
         onClick={onFlip}
       >

@@ -1,6 +1,6 @@
 # Fluently: build brief for Claude Code
 
-**Read this whole file before writing any code.** It holds every decision made during planning (13 Nov 2026). Follow it exactly. If something here is unclear, or a decision seems wrong, ask Tonim before changing it. If Tonim changes a decision, update this file in the same session, so nothing gets lost between sessions.
+**Read this whole file before writing any code.** It holds every decision made during planning (13 Nov 2026), with changes Tonim asked for after launch (15 Nov 2026, marked "Changed 15 Nov"). Follow it exactly. If something here is unclear, or a decision seems wrong, ask Tonim before changing it. If Tonim changes a decision, update this file in the same session, so nothing gets lost between sessions.
 
 ---
 
@@ -32,7 +32,8 @@
 
 **Branding:**
 - Name: **Fluently**.
-- Top bar, left side: "Fluently" in large bold type, followed by a smaller "· IELTS". Underneath, a small tagline: **"Prepare for IELTS like never before."**
+- Top bar, left side: "Fluently" in large bold type, followed by a smaller "· IELTS". **No tagline** (Changed 15 Nov: the tagline "Prepare for IELTS like never before." was removed).
+- Fluently is made and run by one person, so on-screen wording says **I / me**, never we / us (Changed 15 Nov). Error messages are neutral ("This lesson couldn't load…").
 - Footer of every page, small grey text on the right: **"Developed by Kishoar Wasif Chowdhury"**.
 - Colours: navy `#1f3a5f`, teal `#1a9e8f`, light teal `#e8f6f4`, page background `#f6f8fb`, border `#e3e8ef`, muted text `#6b7a8c`, error red `#d93a3a`, success green `#1f9d55`, hint yellow `#ffc94d`.
 - Default font: Inter.
@@ -68,7 +69,7 @@
 - `block_type` values:
   - `heading`: section title (use `title`).
   - `text`: paragraphs. Blank lines separate paragraphs.
-  - `key_rule`: a highlighted box, with `title` as its label.
+  - `key_rule`: a highlighted box, with `title` as its label. Each sentence of the content is shown on its own line ("A → b. C → d." becomes two lines; the split is done by the content script, the Excel is not changed). The box is only as wide as its text and is centred in the content column; the text inside stays left-aligned (Changed 15 Nov).
   - `table`: one row per line, cells separated by ` | `. The first line is the header row.
   - `examples`: one example per line. Lines start with `✓ ` (correct, green) or `✗ ` (incorrect, red).
   - `tip`: a yellow box, with `title` as its label.
@@ -195,7 +196,7 @@ Use **one document per student**, `users/{uid}`, to keep reads and writes low:
 
 ### 3.4 Sign-in and first visit
 
-1. The landing page (not signed in) shows the logo, the tagline, a short 2-line description, a **"Continue with Google"** button and a link to the Privacy page.
+1. The landing page (not signed in) shows the logo, a short 2-line description, a **"Continue with Google"** button and a link to the Privacy page.
 2. **On first sign-in only**, a short "Set up your profile" screen appears:
    - "What should we call you?" The name field is pre-filled with the Google first name and can be edited. Maximum 30 characters.
    - Checkbox, **unticked by default**: "Send me new lessons and updates by email." Ticking it records `emailOptIn = true` and the time.
@@ -257,10 +258,12 @@ Display words with normal spacing: no space before `, . ; : % )`, and none after
 
 1. Clicking (or tapping) a word **selects** it, with a soft yellow highlight.
 2. Clicking more words in the **same sentence** stretches the selection from the first to the last clicked word, including any punctuation between them. Maximum 8 tokens. Clicking a word in another sentence starts a new selection.
-3. A small box appears **just below the selected words**, labelled "Correction". It has a text field (focused automatically), a ✓ button to save and a ✕ button to cancel.
+3. A small box appears **just below the selected words**, labelled "Correction". It has a text field (focused automatically), a ✓ button to save, a 🗑 button to delete the selected words, and a ✕ button to cancel.
    - The box must not cover the line being read. If there is no room below, place it above.
    - Enter saves. Escape cancels.
-4. A saved edit shows the student's text in place of the original, underlined in teal. Clicking it reopens the box. Saving an empty box removes the edit.
+4. A saved edit shows the student's text in place of the original, underlined in teal. Clicking it reopens the box.
+   - **Deleting words** (Changed 15 Nov): saving an empty box, or pressing 🗑, deletes the selected words (an edit with empty text). Deleted words stay visible, struck through in red, and can be clicked to change them. Some fixes need this, e.g. "have used" → "used".
+   - Reopening a saved edit shows an ↺ button that undoes it (the original words come back). Saving the same words as the original also removes the edit.
 5. Blank inputs (`[[B#]]`) cannot be part of a selection.
 6. Punctuation tokens can be selected by stretching across them. They are not individually highlighted on hover.
 
@@ -341,10 +344,10 @@ These protect the final stage:
 - Left: the logo block (section 1).
 - Right, in this order:
   1. **Dashboard** link (hidden on the dashboard itself).
-  2. **Streak badge:** a fire icon with a gentle flicker animation and the day count, e.g. "🔥 5 day streak". It is styled as a warm orange pill with a soft glow. Hover or tap shows AppText `bar.streak_tip`. Turn the animation off if the device asks for reduced motion.
+  2. **Streak badge (dashboard only):** shown only on the dashboard, not on other pages (Changed 15 Nov). A fire icon with a gentle flicker animation and the day count, e.g. "🔥 5 day streak". It is styled as a warm orange pill with a soft glow. Hover or tap shows AppText `bar.streak_tip`. Turn the animation off if the device asks for reduced motion.
   3. **Profile:** avatar circle with initial, name and ▼, which opens the profile menu.
 
-**Footer:** an ⓘ icon with the page's how-to line (AppText) on the left, and "Developed by Kishoar Wasif Chowdhury" small on the right.
+**Footer:** an ⓘ icon with the page's how-to line (AppText) on the left, shown as **short numbered steps** (1, 2, 3, one per sentence) in a light teal box so it is easy to notice (Changed 15 Nov), and "Developed by Kishoar Wasif Chowdhury" small on the right.
 
 **Settings:** there is **no settings page and no display panel on any page**. All settings live in the profile menu.
 
@@ -475,6 +478,7 @@ Keep this page calm, with as few distractions as possible.
     - If fixed: "You wrote **rely**" plus the reason.
     - If wrong: "You wrote ~~xyz~~ · Correct: **is**" plus the reason.
     - If missed: "You did not change ~~are~~ · Correct: **is**" plus the reason.
+    - If the student deleted words: "You removed **have**" (or "You removed ~~have~~ · Correct: **used**" if that was not the fix).
     - The reason is shown as "Why: {explanation}", **for every error, even ones answered correctly**.
     - "Correct" shows the **first** accepted fix.
   - **Blanks:**
@@ -488,12 +492,13 @@ Keep this page calm, with as few distractions as possible.
 
 ### 6.8 Privacy page
 
-Plain and short. It covers:
+Plain and short, written as I / me. It covers:
 - what is stored: Google name, email and progress;
 - why it is stored;
 - that emails are used for updates **only if the student opted in**;
 - how to opt out (the profile menu switch);
 - how to ask for deletion (contact email; ask Tonim which one);
+- how to report a mistake in a lesson, a bug or anything else (contact email) (Changed 15 Nov);
 - that no data is sold;
 - that the site uses Google Firebase.
 
@@ -501,7 +506,7 @@ Ask Tonim for the contact email and show him the final wording.
 
 ### 6.9 Error and empty states
 
-- If content fails to load: "We couldn't load this lesson. Check your internet and try again." with a Retry button.
+- If content fails to load: "This lesson couldn't load. Check your internet and try again." with a Retry button.
 - Offline: show a small banner. Keep unsaved progress on the device and save it once back online.
 - 404 page: a friendly message with a link to the Dashboard.
 
@@ -565,13 +570,14 @@ When new wording is needed (sign-up screen, privacy, errors, confirm boxes, the 
 
 **Dashboard and layout**
 - Unit tags (SVA, ART…) are never shown to students.
-- No Continue button in the progress block. The streak is in the top bar, not in the block.
+- No Continue button in the progress block. The streak is in the top bar, not in the block, and only on the dashboard.
 - Rule page split is 75/25.
 - No display panel on any page; display settings live only in the profile menu.
 - No right panel on the warm-up or drill pages.
 
 **Drill page**
 - Exit is a small red square ✕ beside the clock.
+- Students can delete words in a correction (🗑 or an empty box).
 - The left panel on the drill page can be hidden.
 - No sentence numbers, no sentence locations, no blank counts and no Task 1/Task 2 labels are shown.
 - The clock counts up only, with no time limit.
@@ -591,4 +597,4 @@ When new wording is needed (sign-up screen, privacy, errors, confirm boxes, the 
 **Content and branding**
 - The Excel is the single source of content. All rows are approved; FurtherStudy rows without links stay hidden.
 - The Phrases and Idioms card is greyed out under "Coming Soon".
-- Branding: "Fluently" with the tagline "Prepare for IELTS like never before." and the footer credit "Developed by Kishoar Wasif Chowdhury".
+- Branding: "Fluently · IELTS" with no tagline, and the footer credit "Developed by Kishoar Wasif Chowdhury". Wording says I / me.

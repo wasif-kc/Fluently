@@ -2,7 +2,7 @@
 
 export type Block =
   | { type: 'text'; title?: string; paragraphs: string[] }
-  | { type: 'key_rule'; title?: string; text: string }
+  | { type: 'key_rule'; title?: string; lines: string[] }
   | { type: 'tip'; title?: string; text: string }
   | { type: 'table'; title?: string; header: string[]; rows: string[][] }
   | { type: 'examples'; title?: string; items: { ok: boolean; text: string }[] }

@@ -2,6 +2,27 @@
 
 Read this at the start of every session (CLAUDE.md section 0).
 
+## Session 3 (15 Nov 2026): fixes from the live site
+
+Requested after testing the live site; CLAUDE.md updated (look for "Changed 15 Nov").
+
+| Request | Done |
+|---|---|
+| (?) tip cut off on the left on phones | Tip is kept inside the screen and opens upwards near the bottom. |
+| Remove the tagline | Logo is now "Fluently · IELTS" only (top bar and sign-in page). AppText row `bar.tagline` deleted (it was one I added). |
+| Streak only on the dashboard | Done. |
+| I/me instead of we | All wording rows updated (`setup.*`, `privacy.*`); error messages made neutral (`err.load`, `err.notfound_text`). |
+| Privacy: report mistakes/bugs | New section `privacy.report_h` / `privacy.report` with both contact emails. |
+| "Rule in one line": one line per sentence, box centred | Split by the content script (Excel unchanged); box sized to its text and centred, text left-aligned. |
+| Flashcards jiggle | The 3D flip made the card row taller for a moment; the row no longer changes size (measured: nothing moves now). |
+| Deleting words | 🗑 button (or an empty box) deletes the selected words; deleted words show struck through and can be undone with ↺. 41 of the 265 errors are fixed this way. Results say "You removed **have**". |
+| Footer how-to as steps | Shown as 1, 2, 3 in a light teal box (one step per sentence). |
+| More phone-friendly | Compact drill header; keyboard opens on the first tap on iPhone; no double-tap zoom or text-selection pop-ups on words; hover effects only on devices with a mouse; results open at the top; smaller paddings on phones. |
+| Streak check | New browser test fakes the date: 0 → 1 → same day 1 → next day 2 → 3 → after a gap 0 → 1. All pass. |
+
+AppText now: 41 original rows + 126 added (6 new: `privacy.report_h`, `privacy.report`, `drill.delete_fix`, `drill.restore_fix`, `drill.fix_placeholder`, `res.removed`; 1 removed: `bar.tagline`).
+
+
 ## Session 2 (13 Nov 2026)
 
 ### Answers to the open questions (CLAUDE.md section 10)

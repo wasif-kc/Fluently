@@ -27,7 +27,11 @@ function RuleBlock({ block: b }: { block: Block }) {
       return (
         <div className="rb-key">
           {b.title && <div className="rb-key__label">{b.title}</div>}
-          <div className="rb-key__text">{b.text}</div>
+          <div className="rb-key__text">
+            {b.lines.map((l, i) => (
+              <div key={i}>{l}</div>
+            ))}
+          </div>
         </div>
       );
     case 'tip':

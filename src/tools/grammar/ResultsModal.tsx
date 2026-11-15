@@ -56,14 +56,20 @@ export function ResultsModal({ open, title, grade, timeSec, hintsUsed, nextLabel
                   <div className="res-body">
                     <div className="res-label">{t('res.error_n', { n: errorN })}</div>
                     <div className="res-line">
-                      {r.status === 'fixed' && (
-                        <>
-                          {t('res.you_wrote')} <strong className="good">{r.studentText}</strong>
-                        </>
-                      )}
+                      {r.status === 'fixed' &&
+                        (r.studentText ? (
+                          <>
+                            {t('res.you_wrote')} <strong className="good">{r.studentText}</strong>
+                          </>
+                        ) : (
+                          <>
+                            {t('res.removed')} <strong className="good">{r.removed}</strong>
+                          </>
+                        ))}
                       {r.status === 'wrong' && (
                         <>
-                          {t('res.you_wrote')} <del className="bad">{r.studentText}</del> · {t('res.correct')}{' '}
+                          {r.studentText ? t('res.you_wrote') : t('res.removed')}{' '}
+                          <del className="bad">{r.studentText || r.removed}</del> · {t('res.correct')}{' '}
                           <strong className="good">{it.item.fixes[0]}</strong>
                         </>
                       )}
