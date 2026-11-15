@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 import { CONTACT_EMAILS } from '../config';
 import { IconArrowLeft } from '../components/Icons';
 
-const PARTS = ['what', 'why', 'email', 'optout', 'delete', 'sell', 'firebase'];
+const PARTS = ['what', 'why', 'email', 'optout', 'delete', 'report', 'sell', 'firebase'];
 
 /** Plain, short privacy page (CLAUDE.md 6.8). All wording is in AppText. */
 export function Privacy() {

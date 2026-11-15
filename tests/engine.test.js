@@ -67,6 +67,26 @@ describe('grading an error (4.4)', () => {
   });
 });
 
+describe('deleting words (empty edit)', () => {
+  const tokens = tokenize('Twenty years ago, most students have used printed books.');
+  const [a] = findTokenMatches(tokens, ['have', 'used']);
+  const err = { start: a, end: a + 2, fixes: ['used'] };
+  it('fixed when only the extra word is deleted', () => {
+    const g = gradeError(tokens, err, [{ start: a, end: a + 1, text: '' }]);
+    expect(g.status).toBe('fixed');
+    expect(g.removed).toBe('have');
+    expect(g.studentText).toBe('');
+  });
+  it('wrong when the wrong word is deleted', () => {
+    expect(gradeError(tokens, err, [{ start: a + 1, end: a + 2, text: '' }]).status).toBe('wrong');
+  });
+  it('a deletion where nothing was wrong is an unneeded change', () => {
+    const drill = { sentences: [{ no: 1, tokens }], errors: [{ id: 'X-1-E1', sentence: 1, ...err }], blanks: [] };
+    const g = gradeDrill(drill, { edits: [{ sentence: 1, start: 0, end: 1, text: '' }], blanks: {} });
+    expect(g.items.map((i) => i.kind)).toEqual(['unneeded', 'error']);
+  });
+});
+
 describe('a whole drill', () => {
   const drill = {
     sentences: [

@@ -3,7 +3,9 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { gradeError, gradeBlank, joinTokens, isBlankToken } from '../src/lib/engine.js';
+import { gradeError, gradeBlank, joinTokens, isBlankToken, tokenize } from '../src/lib/engine.js';
+
+let deletionCases = 0;
 
 const DIR = path.resolve('public/content/grammar');
 const index = JSON.parse(fs.readFileSync(path.join(DIR, 'index.json'), 'utf8'));
@@ -51,7 +53,26 @@ describe('every planted error', () => {
       expect(gradeError(tokens, e, [{ start: from, end: to, text: wide }]).status, `wide fix "${wide}"`).toBe('fixed');
       // Capital letters do not matter.
       expect(gradeError(tokens, e, [{ start: a, end: b, text: fix.toUpperCase() }]).status).toBe('fixed');
+
+      // When the fix is the wrong text with some words left out, deleting just those words also works.
+      const wrong = tokens.slice(a, b);
+      const fixToks = tokenize(fix);
+      for (let i = 0; i < wrong.length; i++)
+        for (let j = i + 1; j <= wrong.length; j++) {
+          const rest = [...wrong.slice(0, i), ...wrong.slice(j)];
+          if (rest.length && rest.join(' ').toLowerCase() === fixToks.join(' ').toLowerCase()) {
+            deletionCases += 1;
+            expect(gradeError(tokens, e, [{ start: a + i, end: a + j, text: '' }]).status, `delete "${wrong.slice(i, j).join(' ')}"`).toBe('fixed');
+          }
+        }
     }
+  });
+});
+
+describe('deleting words', () => {
+  it('covers the errors whose fix is a deletion', () => {
+    console.log(`  (${deletionCases} fixes can be made by deleting words)`);
+    expect(deletionCases).toBeGreaterThan(0);
   });
 });
 

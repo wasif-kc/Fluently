@@ -32,6 +32,8 @@ export interface EngineDrill<E extends EngineError = EngineError, B extends Engi
 export interface ErrorGrade {
   status: 'fixed' | 'wrong' | 'missed';
   studentText: string | null;
+  /** original words the student deleted (empty edits) */
+  removed: string;
   regionStart: number;
   regionEnd: number;
   edits: { start: number; end: number; text: string }[];

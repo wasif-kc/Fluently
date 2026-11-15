@@ -24,3 +24,5 @@ export const IconFlame = ({ size, className }: P) => (
     <path d="M12 21a3.2 3.2 0 01-3.2-3.2c0-1.7 1.2-2.7 2.1-3.8.4 1 .9 1.6 1.6 1.9.1-.9.6-1.6 1.1-2 .9 1 1.6 2.3 1.6 3.9A3.2 3.2 0 0112 21z" fill="#ffc94d" />
   </svg>
 );
+export const IconTrash = ({ size, className }: P) => (<svg {...base(size)} className={className}><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3" /></svg>);
+export const IconUndo = ({ size, className }: P) => (<svg {...base(size)} className={className}><path d="M9 14L4 9l5-5M4 9h10a6 6 0 010 12h-3" /></svg>);

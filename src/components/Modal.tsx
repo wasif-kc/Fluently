@@ -18,7 +18,8 @@ export function Modal({ open, onClose, labelledBy, children, className }: Props)
     back.current = document.activeElement as HTMLElement | null;
     const el = box.current;
     const first = el?.querySelector<HTMLElement>('[data-autofocus]') ?? el?.querySelector<HTMLElement>('button, a, input');
-    first?.focus();
+    first?.focus({ preventScroll: true });
+    if (el) el.scrollTop = 0; // open at the top (the title and score), even on small screens
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();

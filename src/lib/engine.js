@@ -130,6 +130,7 @@ function overlaps(aStart, aEnd, bStart, bEnd) {
 /**
  * Build the text of tokens[from, to) with the student's edits applied.
  * edits: [{ start, end, text }] in this sentence, not overlapping each other.
+ * An edit with empty text deletes those words.
  */
 function regionText(tokens, from, to, edits) {
   const parts = [];
@@ -151,14 +152,14 @@ function regionText(tokens, from, to, edits) {
 /**
  * Grade one planted error (CLAUDE.md 4.4).
  * tokens: the sentence tokens. error: { start, end, fixes }. edits: the student's edits in that sentence.
- * Returns { status: 'fixed' | 'wrong' | 'missed', studentText, regionStart, regionEnd, edits }.
+ * Returns { status: 'fixed' | 'wrong' | 'missed', studentText, removed, regionStart, regionEnd, edits }.
  */
 export function gradeError(tokens, error, edits) {
   const a = error.start;
   const b = error.end;
   const touching = edits.filter((e) => overlaps(e.start, e.end, a, b));
   if (touching.length === 0) {
-    return { status: 'missed', studentText: null, regionStart: a, regionEnd: b, edits: [] };
+    return { status: 'missed', studentText: null, removed: '', regionStart: a, regionEnd: b, edits: [] };
   }
   const from = Math.min(a, ...touching.map((e) => e.start));
   const to = Math.max(b, ...touching.map((e) => e.end));
@@ -168,12 +169,17 @@ export function gradeError(tokens, error, edits) {
     const expected = [...tokens.slice(from, a), fix, ...tokens.slice(b, to)].join(' ');
     return compareKey(expected) === studentKey;
   });
-  const studentText = touching
-    .sort((x, y) => x.start - y.start)
+  const sorted = [...touching].sort((x, y) => x.start - y.start);
+  const studentText = sorted
     .map((e) => e.text.trim())
     .filter(Boolean)
     .join(' … ');
-  return { status: fixed ? 'fixed' : 'wrong', studentText, regionStart: from, regionEnd: to, edits: touching };
+  // Words the student removed (an edit with empty text deletes the selected words).
+  const removed = sorted
+    .filter((e) => !e.text.trim())
+    .map((e) => joinTokens(tokens.slice(e.start, e.end)))
+    .join(' … ');
+  return { status: fixed ? 'fixed' : 'wrong', studentText, removed, regionStart: from, regionEnd: to, edits: touching };
 }
 
 /** Grade one blank (CLAUDE.md 4.5). */
