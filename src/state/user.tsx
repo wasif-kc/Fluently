@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { app, loadDb, setSignedInHint } from '../firebase';
 import { useAuth } from './auth';
 import { DEFAULT_SETTINGS, deepMerge, type Settings, type UserDoc } from '../lib/progress';
 import { readLocal, writeLocal } from '../lib/storage';
@@ -61,26 +60,40 @@ export function UserProvider({ children }: { children: ReactNode }) {
     setUnsent({});
     setSent({});
     unsentRef.current = {};
-    if (!uid || !db) return;
-    const ref = doc(db, 'users', uid);
-    return onSnapshot(
-      ref,
-      (snap) => {
-        setExists(snap.exists());
-        setServer(snap.exists() ? (snap.data() as UserDoc) : null);
-        setSent({});
-      },
-      () => setFailed(true),
-    );
+    if (!uid || !app) return;
+    setSignedInHint(true);
+    // The database code is loaded only now, after sign-in.
+    let live = true;
+    let stop: (() => void) | null = null;
+    loadDb()
+      .then((m) => {
+        if (!live) return;
+        stop = m.watchUser(
+          uid,
+          (exists, data) => {
+            setExists(exists);
+            setServer(exists ? (data as UserDoc) : null);
+            setSent({});
+          },
+          () => setFailed(true),
+        );
+      })
+      .catch(() => live && setFailed(true));
+    return () => {
+      live = false;
+      stop?.();
+    };
   }, [uid]);
 
   const write = useCallback(
     (patch: Patch) => {
-      if (!uid || !db || Object.keys(patch).length === 0) return Promise.resolve();
+      if (!uid || !app || Object.keys(patch).length === 0) return Promise.resolve();
       setSent((s) => deepMerge(s, patch));
-      return setDoc(doc(db, 'users', uid), patch, { merge: true }).catch(() => {
-        /* offline writes are queued by Firestore; other failures show up in the snapshot listener */
-      });
+      return loadDb()
+        .then((m) => m.writeUser(uid, patch))
+        .catch(() => {
+          /* offline writes are queued by Firestore; other failures show up in the snapshot listener */
+        });
     },
     [uid],
   );
@@ -165,7 +178,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const createProfile = useCallback(
     async (name: string, optIn: boolean) => {
-      if (!uid || !db || !user) return;
+      if (!uid || !app || !user) return;
       const now = Date.now();
       const fresh: UserDoc = {
         name: name.trim().slice(0, 30),
@@ -180,7 +193,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
         last: null,
         grammar: {},
       };
-      await setDoc(doc(db, 'users', uid), fresh);
+      const m = await loadDb();
+      await m.createUser(uid, fresh as unknown as Record<string, unknown>);
     },
     [uid, user, localSettings],
   );

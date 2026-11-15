@@ -8,7 +8,7 @@ import { Switch } from './Switch';
 import type { FontId } from '../lib/progress';
 
 const FONTS: { id: FontId; label: string; family: string }[] = [
-  { id: 'inter', label: 'Inter', family: "'Inter', sans-serif" },
+  { id: 'inter', label: 'Inter', family: "'Inter Variable', 'Inter', sans-serif" },
   { id: 'opensans', label: 'Open Sans', family: "'Open Sans', sans-serif" },
   { id: 'georgia', label: 'Georgia', family: "Georgia, 'Times New Roman', serif" },
   { id: 'atkinson', label: 'Atkinson', family: "'Atkinson Hyperlegible', sans-serif" },

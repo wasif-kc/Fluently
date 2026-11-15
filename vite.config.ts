@@ -8,7 +8,22 @@ const FIRESTORE = 'http://127.0.0.1:8080';
 
 export default defineConfig({
   plugins: [react()],
-  build: { chunkSizeWarningLimit: 1200 }, // most of the size is Firebase itself
+  build: {
+    chunkSizeWarningLimit: 600,
+    rolldownOptions: {
+      output: {
+        // Libraries go in their own files. They rarely change, so browsers keep them cached
+        // across updates of the site. The database (Firestore) code stays separate and is
+        // downloaded only after sign-in (see src/firebase.ts).
+        codeSplitting: {
+          groups: [
+            { name: 'react', test: /node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler|cookie|set-cookie-parser)[\\/]/, priority: 20 },
+            { name: 'firebase-auth', test: /node_modules[\\/](@firebase[\\/](app|auth|util|component|logger)|firebase[\\/](app|auth)|idb|tslib)[\\/]/, priority: 10 },
+          ],
+        },
+      },
+    },
+  },
   server: {
     host: true,
     port: 5173,

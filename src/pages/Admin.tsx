@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
+import { loadDb } from '../firebase';
 import { Layout } from '../components/Layout';
 import { Spinner } from '../components/LoadError';
 import { NotFound } from './NotFound';
@@ -36,11 +35,11 @@ export default function Admin() {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!db) return;
+
     setError(null);
     try {
-      const snap = await getDocs(collection(db, 'users'));
-      setUsers(snap.docs.map((d) => d.data() as UserDoc));
+      const m = await loadDb();
+      setUsers((await m.listUsers()) as UserDoc[]);
     } catch {
       setError('Could not load students. Check that your email is in the admin list and that the security rules have been published.');
     }
